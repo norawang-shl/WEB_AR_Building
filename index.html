@@ -5,64 +5,27 @@
   <title>1:1 AR House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin:0; overflow:hidden;">
-  <a-scene
-    xrweb
-    embedded
-    arjs="sourceType: webcam; debugUIEnabled: false;"
-    vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true; antialias: true"
-  >
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    
     <!-- 光源 -->
     <a-entity light="type: ambient; intensity: 0.8"></a-entity>
     <a-entity light="type: directional; intensity: 0.6" position="5 10 5"></a-entity>
-
-    <!-- AR 相機 -->
-    <a-entity camera position="0 1.6 0" look-controls></a-entity>
 
     <!-- 房子模型 -->
     <a-entity id="house"
               gltf-model="url(assets/LiuFu_Building.glb)"
               scale="1 1 1"
-              visible="false"
-    ></a-entity>
+              position="0 0 0"
+              rotation="0 180 0"
+              visible="true">
+    </a-entity>
 
-    <!-- 提示文字 -->
-    <a-text id="tapHint" value="點擊平面放置房子"
-            position="0 1.6 -1"
-            align="center"
-            color="#FF0000"
-            width="3">
-    </a-text>
+    <!-- 相機 -->
+    <a-entity camera></a-entity>
 
   </a-scene>
-
-  <script>
-    const sceneEl = document.querySelector('a-scene');
-    const house = document.getElementById('house');
-    const tapHint = document.getElementById('tapHint');
-
-    // 點擊平面放置房子
-    sceneEl.addEventListener('click', async () => {
-      // WebXR hit test
-      const xrSession = sceneEl.xrSession;
-      if (!xrSession) return;
-
-      const viewerSpace = await xrSession.requestReferenceSpace('viewer');
-      const hitTestResults = await xrSession.requestHitTestSource({ space: viewerSpace });
-
-      xrSession.addEventListener('select', (event) => {
-        const hit = hitTestResults.getPose(event.inputSource.targetRaySpace, sceneEl.renderer.xr.getReferenceSpace());
-        if (hit) {
-          const position = hit.transform.position;
-          house.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
-          house.setAttribute('visible', 'true');
-          tapHint.setAttribute('visible', 'false');
-        }
-      });
-    });
-  </script>
 </body>
 </html>
