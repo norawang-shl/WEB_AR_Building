@@ -1,31 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR 建築物固定 2 公尺 Demo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AR 建築模型（固定 2m）</title>
+
+  <!-- model-viewer -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; }
     h1 { text-align: center; margin: 1rem; }
-    model-viewer { display: block; margin: 0 auto; }
+
+    /* 把 model-viewer 內建的一些 UI 隱藏（若你想保留 AR 按鈕可拿掉下面規則） */
+    model-viewer::part(poster) { display: none; }         /* 隱藏海報圖 */
+    model-viewer::part(ar-button) { display: none; }      /* 隱藏 AR 按鈕（Scene Viewer / Quick Look） */
+    model-viewer::part(play-button) { display: none; }    /* 隱藏播放或自動旋轉按鈕 */
+    /* 若瀏覽器不支援 ::part，可以再加 fallback： */
+    model-viewer { outline: none; }
   </style>
 </head>
 <body>
-  <h1>AR 建築模型測試 (固定 2 公尺)</h1>
+  <h1 style="margin-bottom:0.5rem;">AR 建築模型測試（固定 2m）</h1>
 
+  <!-- 正確寫法：所有屬性都放在這個標籤內，不會以文字顯示 -->
   <model-viewer
+    id="viewer"
     src="./LiuFu_Building.glb"
     ar
     ar-modes="webxr scene-viewer quick-look"
-    ar-placement="floor"              <!-- ✅ 放在地板 -->
-    camera-controls
-    auto-rotate
-    disable-zoom                      <!-- ✅ 禁止縮放，保持比例 -->
-    min-camera-orbit="0deg 75deg 2m"  <!-- ✅ 鎖定距離 = 2 公尺 -->
-    max-camera-orbit="0deg 75deg 2m"
-    rotation="0 270deg 0"   <!-- ✅ Y 軸旋轉 90° -->
-    style="width: 100%; height: 80vh;">
+    ar-placement="floor"
+    /* 我把 camera-controls 移除，避免出現控制 UI；若你需要用程式控制相機，請告訴我 */
+    disable-zoom
+    style="width:100%; height:80vh;"
+    rotation="0 90deg 0"
+  >
   </model-viewer>
+
+  <script>
+    // 如果你要程式化地把模型放在相機前方 2m（只在 webxr 可控時），可以用以下想法示範：
+    const viewer = document.querySelector('#viewer');
+
+    // 範例：啟動 AR 時做某些設定（webxr 模式下更有效）
+    viewer.addEventListener('ar-status', (evt) => {
+      // evt.detail.status 可為 'not-presenting' / 'presenting'
+      if (evt.detail.status === 'presenting') {
+        console.log('已進入 AR 模式');
+        // 你可在這裡做更多 webxr 專屬的處理
+      }
+    });
+
+    // 若你只是在一般瀏覽器上看到屬性文字，請檢查 HTML 是否有漏掉 <model-viewer> 的 < 或 >
+    // 或在標籤外面不小心貼了屬性字串 (這是最常見的問題)。
+  </script>
 </body>
 </html>
